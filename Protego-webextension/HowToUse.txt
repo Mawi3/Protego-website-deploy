@@ -1,0 +1,40 @@
+async function scanURLForMaliciousContent(url) {
+    const apiKey = 'aIxE2A7KkZtynJU9J1fKhVqojJkfd2dB'; 
+
+    const apiUrl = `https://www.ipqualityscore.com/api/json/url/aIxE2A7KkZtynJU9J1fKhVqojJkfd2dB/${encodeURIComponent(url)}`;
+
+    try {
+        const response = await fetch(apiUrl);
+        if (response.ok) {
+            const data = await response.json();
+
+            if (data.success) {
+                if (data.unsafe) {
+                    console.log(`The URL ${data.domain} is flagged as unsafe.`);
+                
+                } else {
+                    console.log(`The URL ${data.domain} is safe.`);
+                }
+            } else {
+                console.error('Error scanning URL:', data.message);
+            }
+        } else {
+            console.error('Failed to scan URL:', response.status);
+        }
+    } catch (error) {
+
+        console.error('Error scanning URL:', error);
+    }
+}
+
+
+async function analyzeURL() {
+ 
+    chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
+        const urlToScan = tabs[0].url;
+        scanURLForMaliciousContent(urlToScan);
+    });
+}
+
+// Event listener for the analyze button
+document.getElementById('captureButton').addEventListener('click', analyzeURL);
